@@ -6,7 +6,8 @@
 #include <unistd.h>
 #include "ls2.h"
 
-//TODO - difference between dir and dirent; make sure using readdir correctly to iterate through while loop
+//TODO - ./ls2 . results in seg fault (I think I'm forgetting to free things). Also, the 2 arg case results in triggering failsafe.
+//       ./ls2 also results in seg fault.
 
 /**
  * TODO - comment
@@ -93,7 +94,7 @@ int ls2(stack_t* s, int runMode, char* pattern, char* filePath, int numIndents) 
         }
         readdir(dirp);
     }
-    
+    free(newFilePath);
     return shouldIPrint;
 }
 
@@ -114,6 +115,3 @@ void addIndentsAndName(char* directoryString, int numIndents, char* dirName) {
         strcat(directoryString, dirName);
     }
 }
-
-//remember: readdir() example code searches
-// current directory for specific entry

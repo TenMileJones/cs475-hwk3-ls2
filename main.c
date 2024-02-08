@@ -10,9 +10,10 @@
  * Usage: ls2 <path> [exact-match-pattern]
  */
 int main(int argc, char* argv[]) {
+	argc -= 1;
 	// stack stores the lines to print out
 	if((argc != 1) && (argc != 2)){
-		printf("./ls2 <path> [exact-match-pattern]\n");
+		printf("Improper usage: ./ls2 <path> [exact-match-pattern]\n");
 		return 0;
 	}
 	DIR* dirp = opendir(argv[1]);
