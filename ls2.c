@@ -13,18 +13,23 @@
  * 
  * @return 0 if should not print, 1 if should print
 */
-int ls2(stack_t* s, int runMode, char* pattern[], DIR* dirp, int* numIndents) {
+int ls2(stack_t* s, int runMode, char* pattern, char* filePath, int numIndents) {
     int shouldIPrint = 0;
+    DIR* dirp = opendir(filePath);
     char* dirName = readdir(dirp)->d_name;
+
+    //malloc and concatenate new filePath
+    char* newFilePath = (char*) malloc(2+strlen(filePath)+strlen(dirName));
+    strcpy(newFilePath, filePath);
+    strcat(newFilePath, "/");
+    strcat(newFilePath, dirName);
+    //TODO - change recursive references
     if(runMode == 1)
         shouldIPrint = 1;
     while(dirp != NULL){
-        
-        //test if file or dir with help of lstat
-        //char* filePath = (char*) malloc(1+)
 
         struct stat *fileinfo = (struct stat*) malloc(sizeof(struct stat));
-        lstat(dirp, fileinfo);
+        lstat(newFilePath, fileinfo);
 
         if(S_ISDIR(fileinfo->st_mode)){
             //exclude '.' and '..'
@@ -34,13 +39,13 @@ int ls2(stack_t* s, int runMode, char* pattern[], DIR* dirp, int* numIndents) {
                 continue;
             }
             //if directory, recurse
-            int printMe = ls2(s, runMode, pattern, opendir(dirName), numIndents+1);
+            int printMe = ls2(s, runMode, pattern, newFilePath, numIndents+1);
             if(printMe){
                 shouldIPrint = 1;
                 
                 //allocate space for dir string
                 char dirLabel[] = " (directory)";
-                char* directoryString = (char*) malloc(1+strlen(dirName)+strlen(dirLabel)+(sizeof(INDENT) * *numIndents));
+                char* directoryString = (char*) malloc(1+strlen(dirName)+strlen(dirLabel)+(sizeof(INDENT) * numIndents));
 		        directoryString[0] = '\0';
                 
                 //add indents and name
@@ -71,7 +76,7 @@ int ls2(stack_t* s, int runMode, char* pattern[], DIR* dirp, int* numIndents) {
                 snprintf(fileSizeString, fileSizeStringLength + 1, "%ld", fileSize);
 
                 //allocate space for file string (+10 for '( ', ' bytes)', and '/0')
-                char* directoryString = (char*) malloc(10+strlen(dirName)+strlen(fileSizeString)+(sizeof(INDENT) * *numIndents));
+                char* directoryString = (char*) malloc(10+strlen(dirName)+strlen(fileSizeString)+(sizeof(INDENT) * numIndents));
                 directoryString[0] = '\0';
                 
                 //add indents and name (directoryString is updated, serves as output param)
@@ -97,7 +102,7 @@ void addIndentsAndName(char* directoryString, int numIndents, char* dirName) {
     //add indents
     int i = numIndents-1;
     if(numIndents > 0){
-        strcopy(directoryString, INDENT);
+        strcpy(directoryString, INDENT);
     }
     while(i>0){
         strcat(directoryString, INDENT);

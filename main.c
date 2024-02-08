@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <dirent.h>
+#include <string.h>
 #include "stack.h"
 #include "ls2.h"
 
@@ -22,12 +23,12 @@ int main(int argc, char* argv[]) {
 	stack_t *s = initstack();
 	char *pattern;
 	if(argc == 1){
-		ls2(s, argc, NULL, dirp, 0);
+		ls2(s, argc, NULL, argv[1], 0);
 	} else {
 		pattern = (char*) malloc(strlen(argv[2]+1));
 		pattern[0] = '\0';
 		strcpy(pattern, argv[2]);
-		ls2(s, argc, pattern, dirp, 0);
+		ls2(s, argc, pattern, argv[1], 0);
 	}
 	free(pattern);
 	closedir(dirp);
