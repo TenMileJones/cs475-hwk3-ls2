@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <dirent.h>
 #include "stack.h"
 #include "ls2.h"
 
@@ -13,14 +14,18 @@ int main(int argc, char* argv[]) {
 		printf("./ls2 <path> [exact-match-pattern]\n");
 		return 0;
 	}
-	void* dirp = opendir(argv[1]);
+	DIR* dirp = opendir(argv[1]);
 	if(dirp == NULL){
 		printf("%s is not a directory path! Exiting...\n", argv[1]);
 		return 0;
 	}
-	
-	
 	stack_t *s = initstack();
+	char *pattern = (char*) malloc(strlen(argv[2]+1));
+	pattern[0] = '\0';
+	strcpy(pattern, argv[2]);
+	int numIndents = 0;
+	ls2(s, argc, pattern, dirp, numIndents);
+	
 
 	
 	
