@@ -27,18 +27,10 @@ int main(int argc, char* argv[]) {
 		pattern = (char*) malloc(strlen(argv[2]+1));
 		pattern[0] = '\0';
 		strcpy(pattern, argv[2]);
+		ls2(s, argc, pattern, dirp, 0);
 	}
 	free(pattern);
-	
-	
-	
-
-	
-	
-	
-	push(s, "Hello1");
-	push(s, "Hello2");
-	push(s, "Hello3");
+	closedir(dirp);
 
 	// print stack
 	printstack(s);
