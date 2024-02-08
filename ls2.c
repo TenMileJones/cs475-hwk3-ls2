@@ -16,3 +16,6 @@
 void example(int* x) {
     *x = thisIsGlobal;
 } 
+
+//remember: readdir() example code searches
+// current directory for specific entry
