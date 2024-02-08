@@ -20,11 +20,17 @@ int main(int argc, char* argv[]) {
 		return 0;
 	}
 	stack_t *s = initstack();
-	char *pattern = (char*) malloc(strlen(argv[2]+1));
-	pattern[0] = '\0';
-	strcpy(pattern, argv[2]);
-	int numIndents = 0;
-	ls2(s, argc, pattern, dirp, numIndents);
+	char *pattern;
+	if(argc == 1){
+		ls2(s, argc, NULL, dirp, 0);
+	} else {
+		pattern = (char*) malloc(strlen(argv[2]+1));
+		pattern[0] = '\0';
+		strcpy(pattern, argv[2]);
+	}
+	free(pattern);
+	
+	
 	
 
 	

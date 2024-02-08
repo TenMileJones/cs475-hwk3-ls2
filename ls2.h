@@ -12,6 +12,7 @@ int thisIsGlobal = 10;  // delete before submission
 
 // TODO: Function declarations go below
 void example(int*); // delete before submission
-void ls2(stack_t* s, int* mode, char* pattern[], DIR* dirp, int* numIndents);
+int ls2(stack_t* s, int* runMode, char* pattern[], DIR* dirp, int* numIndents);
+char* getNameFromDirent(struct dirent* dirp);
 
 #endif
