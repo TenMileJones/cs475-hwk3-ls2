@@ -6,8 +6,7 @@
 #include <unistd.h>
 #include "ls2.h"
 
-//TODO - ./ls2 . results in seg fault (I think I'm forgetting to free things). Also, the 2 arg case results in triggering failsafe.
-//       ./ls2 also results in seg fault.
+//TODO - ./ls2 is looping once more.
 
 /**
  * TODO - comment
@@ -16,19 +15,26 @@
 */
 int ls2(stack_t* s, int runMode, char* pattern, char* filePath, int numIndents) {
     int shouldIPrint = 0;
-    DIR* dirp = opendir(filePath);
-    char* dirName = readdir(dirp)->d_name;
+    if(runMode == 1)
+        shouldIPrint = 1;
 
+    DIR* dirp = opendir(filePath);
+    struct dirent* readResult = readdir(dirp);
+    char* dirName; 
+    if(readResult != NULL){
+        dirName = readResult->d_name;
+    } else { //if first read result is null, directory is empty?
+        return shouldIPrint;
+    }
     //malloc and concatenate new filePath
     char* newFilePath = (char*) malloc(2+strlen(filePath)+strlen(dirName));
     strcpy(newFilePath, filePath);
     strcat(newFilePath, "/");
     strcat(newFilePath, dirName);
-    //TODO - change recursive references
-    if(runMode == 1)
-        shouldIPrint = 1;
+    
+    
     while(dirp != NULL){
-
+        
         struct stat *fileinfo = (struct stat*) malloc(sizeof(struct stat));
         lstat(newFilePath, fileinfo);
 
@@ -36,7 +42,10 @@ int ls2(stack_t* s, int runMode, char* pattern, char* filePath, int numIndents) 
             //exclude '.' and '..'
             if((strcmp(".", dirName) == 0) || strcmp("..", dirName) == 0){
                 //skip this directory entry
-                readdir(dirp);
+                readResult = readdir(dirp);
+                if(readResult != NULL){
+                    dirName = readResult->d_name;
+                }
                 continue;
             }
             //if directory, recurse
@@ -92,7 +101,11 @@ int ls2(stack_t* s, int runMode, char* pattern, char* filePath, int numIndents) 
                 free(fileSizeString);
             }
         }
-        readdir(dirp);
+        readResult = readdir(dirp);
+        if(readResult != NULL){
+            dirName = readResult->d_name;
+        }
+        free(fileinfo);
     }
     free(newFilePath);
     return shouldIPrint;
