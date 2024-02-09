@@ -20,31 +20,44 @@ int ls2(stack_t* s, int runMode, char* pattern, char* filePath, int numIndents) 
 
     DIR* dirp = opendir(filePath);
     struct dirent* readResult = readdir(dirp);
-    char* dirName; 
-    if(readResult != NULL){
-        dirName = readResult->d_name;
-    } else { //if first read result is null, directory is empty?
-        return shouldIPrint;
+    char* dirName;
+    while(TRUE){
+        if(readResult != NULL){
+            dirName = readResult->d_name;
+        } else { 
+            //new dirent is null, therefore end of this directory
+            closedir(dirp);
+            return shouldIPrint;
+        }
+        break;
     }
-    //malloc and concatenate new filePath
-    char* newFilePath = (char*) malloc(2+strlen(filePath)+strlen(dirName));
-    strcpy(newFilePath, filePath);
-    strcat(newFilePath, "/");
-    strcat(newFilePath, dirName);
+    //TODO - newFilePath malloc was here
+
     
-    
-    while(dirp != NULL){
+    while(readResult != NULL){
+        //TODO - not convinced that this is where/how file path should be created
+        //malloc and concatenate new filePath
+        char* newFilePath = (char*) malloc(2+strlen(filePath)+strlen(dirName));
+        newFilePath[0] = '\0';
+        strcpy(newFilePath, filePath);
+        strcat(newFilePath, "/");
+        strcat(newFilePath, dirName);
         
         struct stat *fileinfo = (struct stat*) malloc(sizeof(struct stat));
         lstat(newFilePath, fileinfo);
 
         if(S_ISDIR(fileinfo->st_mode)){
+            
             //exclude '.' and '..'
-            if((strcmp(".", dirName) == 0) || strcmp("..", dirName) == 0){
+            if(isForbiddenDirName(dirName)){
                 //skip this directory entry
                 readResult = readdir(dirp);
                 if(readResult != NULL){
                     dirName = readResult->d_name;
+                } else {
+                    //new dirent is null, therefore end of this directory
+                    free(fileinfo);
+                    break;
                 }
                 continue;
             }
@@ -83,6 +96,7 @@ int ls2(stack_t* s, int runMode, char* pattern, char* filePath, int numIndents) 
                 long fileSize = fileinfo->st_size;
                 int fileSizeStringLength = snprintf(NULL, 0, "%ld", fileSize);
                 char* fileSizeString = malloc(fileSizeStringLength+1);
+                fileSizeString[0] = '\0';
                 snprintf(fileSizeString, fileSizeStringLength + 1, "%ld", fileSize);
 
                 //allocate space for file string (+10 for '( ', ' bytes)', and '/0')
@@ -106,8 +120,9 @@ int ls2(stack_t* s, int runMode, char* pattern, char* filePath, int numIndents) 
             dirName = readResult->d_name;
         }
         free(fileinfo);
+        free(newFilePath);
     }
-    free(newFilePath);
+    closedir(dirp);
     return shouldIPrint;
 }
 
@@ -127,4 +142,11 @@ void addIndentsAndName(char* directoryString, int numIndents, char* dirName) {
     } else {
         strcat(directoryString, dirName);
     }
+}
+
+int isForbiddenDirName(char* dirName) {
+    if((strcmp(".", dirName) == 0) || (strcmp("..", dirName) == 0)){
+        return TRUE;
+    }
+    return FALSE;
 }
