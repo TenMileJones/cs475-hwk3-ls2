@@ -6,11 +6,15 @@
 #include <unistd.h>
 #include "ls2.h"
 
-//TODO - ./ls2 is looping once more.
-
 /**
- * TODO - comment
- * 
+ * An overhauled version of the file listing command 'ls'. Prints all files and subdirectories recursively in mode 1,
+ * or only ones that are relevant to pattern if in mode 2.
+ * @param s stack_t that stores strings to be printed as output
+ * @param runMode int MUST BE 1 or 2: 1 prints all files and subdirectories. 2 prints only files exactly matching pattern, 
+ *      and its parent directories
+ * @param pattern String pattern of file user wants to find in mode 2.
+ * @param filePath String filepath of current level of recursion
+ * @param numIndents int number of indentations, equal to number of recursive calls. Should start at 0.
  * @return 0 if should not print, 1 if should print
 */
 int ls2(stack_t* s, int runMode, char* pattern, char* filePath, int numIndents) {
@@ -31,11 +35,8 @@ int ls2(stack_t* s, int runMode, char* pattern, char* filePath, int numIndents) 
         }
         break;
     }
-    //TODO - newFilePath malloc was here
-
     
     while(readResult != NULL){
-        //TODO - not convinced that this is where/how file path should be created
         //malloc and concatenate new filePath
         char* newFilePath = (char*) malloc(2+strlen(filePath)+strlen(dirName));
         newFilePath[0] = '\0';
@@ -127,7 +128,12 @@ int ls2(stack_t* s, int runMode, char* pattern, char* filePath, int numIndents) 
     return shouldIPrint;
 }
 
-
+/**
+ * Helper method for ls2. Creates the first part of the output string for a given file that will be passed to the output stack.
+ * @param directoryString pointer to empty string to be added to. Serves as output parameter
+ * @param numIndents int number of indentations to concatenate to start of directoryString
+ * @param dirName String name of directory to be concatenated after indentations
+*/
 void addIndentsAndName(char* directoryString, int numIndents, char* dirName) {
     //add indents
     int i = numIndents-1;
@@ -146,6 +152,11 @@ void addIndentsAndName(char* directoryString, int numIndents, char* dirName) {
     }
 }
 
+/**
+ * Helper method for ls2. Determines if this directory name is forbidden/should be ignored by ls2.
+ * @param dirName String name of directory
+ * @return 1 if directory name is forbidden, 0 otherwise
+*/
 int isForbiddenDirName(char* dirName) {
     if((strcmp(".", dirName) == 0) || (strcmp("..", dirName) == 0)){
         return TRUE;

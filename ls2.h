@@ -7,9 +7,7 @@
 #define FALSE 0
 #define INDENT "    "
 
-// TODO: Any global variables go below
 
-// TODO: Function declarations go below
 int ls2(stack_t* s, int runMode, char* pattern, char* filePath, int numIndents);
 void addIndentsAndName(char* directoryString, int numIndents, char* dirName);
 int isForbiddenDirName(char* dirName);
