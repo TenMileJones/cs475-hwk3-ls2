@@ -52,11 +52,12 @@ int ls2(stack_t* s, int runMode, char* pattern, char* filePath, int numIndents) 
             if(isForbiddenDirName(dirName)){
                 //skip this directory entry
                 readResult = readdir(dirp);
+                free(newFilePath);
+                free(fileinfo);
                 if(readResult != NULL){
                     dirName = readResult->d_name;
                 } else {
                     //new dirent is null, therefore end of this directory
-                    free(fileinfo);
                     break;
                 }
                 continue;
@@ -68,7 +69,7 @@ int ls2(stack_t* s, int runMode, char* pattern, char* filePath, int numIndents) 
                 
                 //allocate space for dir string
                 char dirLabel[] = " (directory)";
-                char* directoryString = (char*) malloc(1+strlen(dirName)+strlen(dirLabel)+(sizeof(INDENT) * numIndents));
+                char* directoryString = (char*) malloc(1+strlen(dirName)+strlen(dirLabel)+(strlen(INDENT) * numIndents));
 		        directoryString[0] = '\0';
                 
                 //add indents and name
@@ -99,8 +100,8 @@ int ls2(stack_t* s, int runMode, char* pattern, char* filePath, int numIndents) 
                 fileSizeString[0] = '\0';
                 snprintf(fileSizeString, fileSizeStringLength + 1, "%ld", fileSize);
 
-                //allocate space for file string (+10 for '( ', ' bytes)', and '/0')
-                char* directoryString = (char*) malloc(10+strlen(dirName)+strlen(fileSizeString)+(sizeof(INDENT) * numIndents));
+                //allocate space for file string (+10 for ' (', ' bytes)', and '/0')
+                char* directoryString = (char*) malloc(10+strlen(dirName)+strlen(fileSizeString)+(strlen(INDENT) * numIndents));
                 directoryString[0] = '\0';
                 
                 //add indents and name (directoryString is updated, serves as output param)
@@ -135,6 +136,7 @@ void addIndentsAndName(char* directoryString, int numIndents, char* dirName) {
     }
     while(i>0){
         strcat(directoryString, INDENT);
+        i--;
     }
     //add directory name
     if(numIndents == 0){
